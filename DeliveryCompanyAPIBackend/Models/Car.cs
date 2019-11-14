@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace DeliveryCompanyAPIBackend.Models
 {
-    public class Cars
+    public class Car
     {
         [Key]
         public int RegistrationNumber { get; set; }
 
-        public int DepartmentsId { get; set; }
-        public Departments Department { get; set; }
+        public int DepartmentId { get; set; }
+        public Department Department { get; set; }
 
         public int VIN { get; set; }
         public string Mark { get; set; }

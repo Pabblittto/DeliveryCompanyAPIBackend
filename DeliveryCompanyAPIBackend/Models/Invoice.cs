@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace DeliveryCompanyAPIBackend.Models
 {
-    public class Contracts
+    public class Invoice// faktura
     {
         [Key]
         public int Id { get; set; }
 
-        public int WorkersId { get; set; }
-        public Workers Worker { get; set; }
+        public int DepartmentId { get; set; }
+        public Department department { get; set; }
 
-        public DataType Data { get; set; }
+        public DataType data { get; set; }
+        public string Description { get; set; }
         public string FilePath { get; set; }
 
     }
