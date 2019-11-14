@@ -7,5 +7,9 @@ namespace DeliveryCompanyAPIBackend.Models
 {
     public class Workers
     {
+
+
+
+        public Contracts contracts { get; set; }// need by convention
     }
 }
