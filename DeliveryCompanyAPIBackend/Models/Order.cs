@@ -15,10 +15,10 @@ namespace DeliveryCompanyAPIBackend.Models
         public int DepartmentId { get; set; }
         public Department department { get; set; }
 
-        [ForeignKey("SenderId")]
+        public int SenderId { get; set; }
         public Person Sender { get; set; }
 
-        [ForeignKey("ReceiverId")]
+        public int ReciverId { get; set; }
         public Person Receiver { get; set; }
 
         public string State { get; set; }//state of the order

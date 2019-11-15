@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,23 +7,39 @@ using System.Threading.Tasks;
 
 namespace DeliveryCompanyAPIBackend.Models
 {
-    public class CompanyContext:DbContext
+    public class CompanyContext: IdentityDbContext
     {
         public CompanyContext(DbContextOptions options) : base(options)
         {
 
         }
 
-        public CompanyContext()
-        {
+        //public CompanyContext()
+        //{
 
-        }
+        //}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // tu wszelkie ustawienie bazy danych trzeba wykonać
+
+            // konfigurowanie bazy danych 
+
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {//konfigurowanie shematu bazy danych
+            base.OnModelCreating(builder);
+            builder.Entity<Order>()
+                .HasOne(obj => obj.Receiver)
+                .WithMany(obj => obj.BeeingReceiver)
+                .HasForeignKey(obj => obj.ReciverId);
+
+            builder.Entity<Order>()
+                .HasOne(obj => obj.Sender)
+                .WithMany(obj => obj.BeeingSender)
+                .HasForeignKey(obj => obj.SenderId);
+
+        }
 
 
         public DbSet<Department> Departments { get; set; }
