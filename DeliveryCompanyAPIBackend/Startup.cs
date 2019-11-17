@@ -95,7 +95,17 @@ namespace DeliveryCompanyAPIBackend
             app.UseCors();
             app.UseAuthentication();
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseMvc(options=>
+            {
+                options.MapRoute(
+                    name: "default",
+                    template:"api/{controller}/{action}/{id?}"
+                    );
+                options.MapRoute(
+                    name:"aditional",
+                    template:"api/"
+                    );
+            });
         }
     }
 }
