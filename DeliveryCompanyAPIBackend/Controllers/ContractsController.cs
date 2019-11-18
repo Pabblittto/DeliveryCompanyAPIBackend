@@ -28,23 +28,23 @@ namespace DeliveryCompanyAPIBackend.Controllers
         }
 
         [HttpGet("{id}")]// api/Contracts/id
-        public async Task<ActionResult<Car>> GetContract(int id)
+        public async Task<ActionResult<Contract>> Get(int id)
         {
-            var Contract = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
+            var contract = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (Contract == null)
+            if (contract == null)
             {
                 List<string> Messages = new List<string>();
-                Messages.Add("Contract with certain id not found");
+                Messages.Add($"Contract with certain id={id} not found");
                 return NotFound(Messages);
             }
 
-            return Ok(Contract);
+            return Ok(contract);
         }
 
 
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<Car>>> GetContracts(int amount, int page)
+        public async Task<ActionResult<ICollection<Contract>>> GetContracts(int amount, int page)
         {
             if (amount == 0)
             {
@@ -96,8 +96,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
         }
 
 
-        [HttpPatch]// api/Contracts/Update
-        public async Task<ActionResult> Update(int id, Contract UpContract)
+        [HttpPatch("{id}")]// api/Contracts/Update
+        public async Task<ActionResult> Update(int id, [FromBody] Contract UpContract)
         {
 
             List<string> Messages = new List<string>();
@@ -149,13 +149,13 @@ namespace DeliveryCompanyAPIBackend.Controllers
             }
             else
             {
-                Messages.Add("There is no Contract with certain id");
+                Messages.Add($"There is no Contract with certain id={id}");
                 return NotFound(Messages);
             }
         }
 
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             List<string> Messages = new List<string>();
@@ -195,8 +195,10 @@ namespace DeliveryCompanyAPIBackend.Controllers
             NewContract.Worker = worker;
 
             await _context.AddAsync(NewContract);
+            await _context.SaveChangesAsync();
+
             Messages.Add("Contract added succesfully");
-            return Ok();
+            return Ok(Messages);
         }
 
 

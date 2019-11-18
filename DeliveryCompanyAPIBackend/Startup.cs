@@ -101,10 +101,6 @@ namespace DeliveryCompanyAPIBackend
                     name: "default",
                     template:"api/{controller}/{action}/{id?}"
                     );
-                options.MapRoute(
-                    name:"aditional",
-                    template:"api/"
-                    );
             });
         }
     }

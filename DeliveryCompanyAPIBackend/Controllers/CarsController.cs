@@ -9,7 +9,7 @@ using DeliveryCompanyAPIBackend.Models;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CarsController : ControllerBase
     {
@@ -29,14 +29,14 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
 
         [HttpGet("{id}")]// api/Cars/id
-        public async Task<ActionResult<Car>> GetCar(int id)
+        public async Task<ActionResult<Car>> Get(int id)
         {
             var car = await _context.Cars.FirstOrDefaultAsync(ob => ob.RegistrationNumber == id);
 
             if (car == null)
             {
                 List<string> Messages = new List<string>();
-                Messages.Add("Car with certain id not found");
+                Messages.Add($"Car with certain id={id} not found");
                 return NotFound(Messages);
             }
 
@@ -95,8 +95,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
             
         }
 
-        [HttpPatch]// api/Cars/Update
-        public async Task<ActionResult> Update(int id, Car UpCar)
+        [HttpPatch("{id}")]// api/Cars/Update
+        public async Task<ActionResult> Update(int id, [FromBody] Car UpCar)
         {
 
             List<string> Messages = new List<string>();
@@ -151,12 +151,12 @@ namespace DeliveryCompanyAPIBackend.Controllers
             }
             else
             {
-                Messages.Add("There is no car with certain id");
+                Messages.Add($"There is no car with certain id={id}");
                 return NotFound(Messages);
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             List<string> Messages = new List<string>();
@@ -196,8 +196,10 @@ namespace DeliveryCompanyAPIBackend.Controllers
             NewCar.Department = department;
 
             await _context.AddAsync(NewCar);
+            await _context.SaveChangesAsync();
+
             Messages.Add("Car added succesfully");
-            return Ok();
+            return Ok(Messages);
 
         }
 
