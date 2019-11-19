@@ -9,13 +9,13 @@ using DeliveryCompanyAPIBackend.Models;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentsController : ControllerBase
+    public class PeopleController : ControllerBase
     {
         private readonly CompanyContext _context;
 
-        public DepartmentsController(CompanyContext context)
+        public PeopleController(CompanyContext context)
         {
             _context = context;
         }
@@ -23,28 +23,27 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAmount()
         {
-            var amount = await _context.Departments.CountAsync();
+            var amount = await _context.People.CountAsync();
             return Ok(amount);
         }
 
         [HttpGet("{id}")]// api/departments/id
-        public async Task<ActionResult<Department>> Get(int id)
+        public async Task<ActionResult<Person>> Get(int id)
         {
-            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
+            var person = await _context.People.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (department == null)
+            if (person == null)
             {
                 List<string> Messages = new List<string>();
-                Messages.Add($"Department with certain id={id} not found");
+                Messages.Add($"Person with certain id={id} not found");
                 return NotFound(Messages);
             }
 
-            return Ok(department);
+            return Ok(person);
         }
 
-
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<Department>>> GetMany(int amount, int page)
+        public async Task<ActionResult<ICollection<Person>>> GetMany(int amount, int page)
         {
             if (amount == 0)
             {
@@ -52,16 +51,15 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 return NotFound(Messages);
             }
 
-            List<Department> PartOfDepartments = await _context.Departments.ToListAsync();// get all list
+            List<Person> PartOfPeople = await _context.People.ToListAsync();// get all list
             try
             {
-                if (PartOfDepartments.Count != 0)// there is something in this list
-                {
-                    //page-=1;// because index is counted from 0
+                if (PartOfPeople.Count != 0)// there is something in this list
+                { 
 
-                    if (PartOfDepartments.Count < (page) * amount)// if there is less elemnts for one page - take less elements
+                    if (PartOfPeople.Count < (page) * amount)// if there is less elemnts for one page - take less elements
                     {
-                        int amount2 = PartOfDepartments.Count - (page - 1) * amount;// number of elements less than it should be
+                        int amount2 = PartOfPeople.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
                             List<string> Messages = new List<string>()
@@ -70,19 +68,19 @@ namespace DeliveryCompanyAPIBackend.Controllers
                             };
                             return NotFound(Messages);
                         }
-                        PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount2);
+                        PartOfPeople = PartOfPeople.GetRange((page - 1) * amount, amount2);
                     }
                     else
                     {
-                        PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount);
+                        PartOfPeople = PartOfPeople.GetRange((page - 1) * amount, amount);
                     }
-                    return Ok(PartOfDepartments);
+                    return Ok(PartOfPeople);
                 }
                 else
                 {
                     List<string> Messages = new List<string>()
                 {
-                    "There are no Departments to display"
+                    "There are no people to display"
                 };
                     return NotFound(Messages);
                 }
@@ -93,31 +91,30 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
                 return NotFound(Messages);
             }
-
         }
 
-        [HttpPatch("{id}")]// api/Departments/Update
-        public async Task<ActionResult> Update(int id,[FromBody] Department UpDepartment)
+        [HttpPatch("{id}")]// api/Packs/Update
+        public async Task<ActionResult> Update(int id, [FromBody] Person UpPerson)
         {
 
             List<string> Messages = new List<string>();
 
-            if (id == 0 || UpDepartment == null)
+            if (id == 0 || UpPerson == null)
             {
-                Messages.Add("ID or Department object is null");
+                Messages.Add("ID or Person object is null");
                 return BadRequest(Messages);
             }
 
-            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
+            var person = await _context.People.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (department != null)
+            if (person != null)
             {
-                if (department.BankAccountNo != UpDepartment.BankAccountNo) { department.BankAccountNo = UpDepartment.BankAccountNo; }
-                if (department.BuildingNo != UpDepartment.BuildingNo) { department.BuildingNo = UpDepartment.BuildingNo; }
-                if (department.ManagerTelNo != UpDepartment.ManagerTelNo) { department.ManagerTelNo = UpDepartment.ManagerTelNo; }
-                if (department.OfficeTelNo != UpDepartment.OfficeTelNo) { department.OfficeTelNo = UpDepartment.OfficeTelNo; }
-                if (department.Street != UpDepartment.Street) { department.Street = UpDepartment.Street; }
-                if (department.Name != UpDepartment.Name) { department.Name = UpDepartment.Name; }
+                if (person.BuildingNo != UpPerson.BuildingNo) { person.BuildingNo = UpPerson.BuildingNo; }
+                if (person.City != UpPerson.City) { person.City = UpPerson.City; }
+                if (person.Name != UpPerson.Name) { person.Name = UpPerson.Name; }
+                if (person.Street != UpPerson.Street) { person.Street = UpPerson.Street; }
+                if (person.Surname != UpPerson.Surname) { person.Surname = UpPerson.Surname; }
+                if (person.TelNo != UpPerson.TelNo) { person.TelNo = UpPerson.TelNo; }
 
 
                 try
@@ -126,7 +123,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Department updated succesfully");
+                        Messages.Add("Person updated succesfully");
                         return Ok(Messages);
                     }
                     else
@@ -144,7 +141,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
             }
             else
             {
-                Messages.Add($"There is no department with certain id={id}");
+                Messages.Add($"There is no person with certain id={id}");
                 return NotFound(Messages);
             }
         }
@@ -153,38 +150,39 @@ namespace DeliveryCompanyAPIBackend.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             List<string> Messages = new List<string>();
-            var departmentToDelete = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
-            if (departmentToDelete == null)
+            var personToDelete = await _context.People.FirstOrDefaultAsync(ob => ob.Id == id);
+            if (personToDelete == null)
             {
-                Messages.Add("Department with certain id was not found");
+                Messages.Add("Person with certain id was not found");
                 return NotFound(Messages);
             }
 
-            _context.Departments.Remove(departmentToDelete);
+            _context.People.Remove(personToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Department deleted succesfully");
+            Messages.Add("Person deleted succesfully");
             return Ok(Messages);
         }
-
 
         [HttpPost]
-        public async Task<ActionResult> Add([FromBody]Department department)
+        public async Task<ActionResult> Add([FromBody]Person person)
         {
             List<string> Messages = new List<string>();
-            if (department == null)
+            if (person == null)
             {
-                Messages.Add("Recived department is null");
+                Messages.Add("Recived person is null");
                 return NotFound(Messages);
             }
-            Department NewDepartment = department;
+
+            Person NewPerson = person;
 
 
-            await _context.AddAsync(NewDepartment);
+            await _context.AddAsync(NewPerson);
             await _context.SaveChangesAsync();
-            Messages.Add("Department added succesfully");
+            Messages.Add("Person added succesfully");
             return Ok(Messages);
         }
+
 
     }
 }

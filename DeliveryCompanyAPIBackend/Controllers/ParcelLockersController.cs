@@ -9,13 +9,13 @@ using DeliveryCompanyAPIBackend.Models;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentsController : ControllerBase
+    public class ParcelLockersController : ControllerBase
     {
         private readonly CompanyContext _context;
 
-        public DepartmentsController(CompanyContext context)
+        public ParcelLockersController(CompanyContext context)
         {
             _context = context;
         }
@@ -23,28 +23,27 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAmount()
         {
-            var amount = await _context.Departments.CountAsync();
+            var amount = await _context.ParcelLockers.CountAsync();
             return Ok(amount);
         }
 
         [HttpGet("{id}")]// api/departments/id
-        public async Task<ActionResult<Department>> Get(int id)
+        public async Task<ActionResult<ParcelLocker>> Get(int id)
         {
-            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
+            var locker = await _context.ParcelLockers.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (department == null)
+            if (locker == null)
             {
                 List<string> Messages = new List<string>();
-                Messages.Add($"Department with certain id={id} not found");
+                Messages.Add($"Locker with certain id={id} not found");
                 return NotFound(Messages);
             }
 
-            return Ok(department);
+            return Ok(locker);
         }
 
-
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<Department>>> GetMany(int amount, int page)
+        public async Task<ActionResult<ICollection<ParcelLocker>>> GetMany(int amount, int page)
         {
             if (amount == 0)
             {
@@ -52,16 +51,16 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 return NotFound(Messages);
             }
 
-            List<Department> PartOfDepartments = await _context.Departments.ToListAsync();// get all list
+            List<ParcelLocker> PartOfLockers = await _context.ParcelLockers.ToListAsync();// get all list
             try
             {
-                if (PartOfDepartments.Count != 0)// there is something in this list
+                if (PartOfLockers.Count != 0)// there is something in this list
                 {
                     //page-=1;// because index is counted from 0
 
-                    if (PartOfDepartments.Count < (page) * amount)// if there is less elemnts for one page - take less elements
+                    if (PartOfLockers.Count < (page) * amount)// if there is less elemnts for one page - take less elements
                     {
-                        int amount2 = PartOfDepartments.Count - (page - 1) * amount;// number of elements less than it should be
+                        int amount2 = PartOfLockers.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
                             List<string> Messages = new List<string>()
@@ -70,19 +69,19 @@ namespace DeliveryCompanyAPIBackend.Controllers
                             };
                             return NotFound(Messages);
                         }
-                        PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount2);
+                        PartOfLockers = PartOfLockers.GetRange((page - 1) * amount, amount2);
                     }
                     else
                     {
-                        PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount);
+                        PartOfLockers = PartOfLockers.GetRange((page - 1) * amount, amount);
                     }
-                    return Ok(PartOfDepartments);
+                    return Ok(PartOfLockers);
                 }
                 else
                 {
                     List<string> Messages = new List<string>()
                 {
-                    "There are no Departments to display"
+                    "There are no Lockers to display"
                 };
                     return NotFound(Messages);
                 }
@@ -96,29 +95,35 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
         }
 
-        [HttpPatch("{id}")]// api/Departments/Update
-        public async Task<ActionResult> Update(int id,[FromBody] Department UpDepartment)
+        [HttpPatch("{id}")]// api/Packs/Update
+        public async Task<ActionResult> Update(int id, [FromBody] ParcelLocker UpLocker)
         {
 
             List<string> Messages = new List<string>();
 
-            if (id == 0 || UpDepartment == null)
+            if (id == 0 || UpLocker == null)
             {
-                Messages.Add("ID or Department object is null");
+                Messages.Add("ID or Locker object is null");
                 return BadRequest(Messages);
             }
 
-            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
+            var locker = await _context.ParcelLockers.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (department != null)
+            if (locker != null)
             {
-                if (department.BankAccountNo != UpDepartment.BankAccountNo) { department.BankAccountNo = UpDepartment.BankAccountNo; }
-                if (department.BuildingNo != UpDepartment.BuildingNo) { department.BuildingNo = UpDepartment.BuildingNo; }
-                if (department.ManagerTelNo != UpDepartment.ManagerTelNo) { department.ManagerTelNo = UpDepartment.ManagerTelNo; }
-                if (department.OfficeTelNo != UpDepartment.OfficeTelNo) { department.OfficeTelNo = UpDepartment.OfficeTelNo; }
-                if (department.Street != UpDepartment.Street) { department.Street = UpDepartment.Street; }
-                if (department.Name != UpDepartment.Name) { department.Name = UpDepartment.Name; }
+                if (locker.CellsAmount != UpLocker.CellsAmount) { locker.CellsAmount = UpLocker.CellsAmount; }
+                if (locker.FreeCells != UpLocker.FreeCells) { locker.FreeCells = UpLocker.FreeCells; }
+                if (locker.StreetId != UpLocker.StreetId) { locker.StreetId = UpLocker.StreetId; }
 
+                var street = await _context.Streets.FirstOrDefaultAsync(ob => ob.Id == UpLocker.StreetId);
+
+                if (street == null)
+                {
+                    Messages.Add($"There is no street type with given id={UpLocker.StreetId}");
+                    return NotFound(Messages);
+                }
+
+                locker.street = street;
 
                 try
                 {
@@ -126,7 +131,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Department updated succesfully");
+                        Messages.Add("Locker updated succesfully");
                         return Ok(Messages);
                     }
                     else
@@ -144,7 +149,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
             }
             else
             {
-                Messages.Add($"There is no department with certain id={id}");
+                Messages.Add($"There is no parcel locker with certain id={id}");
                 return NotFound(Messages);
             }
         }
@@ -153,38 +158,43 @@ namespace DeliveryCompanyAPIBackend.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             List<string> Messages = new List<string>();
-            var departmentToDelete = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
-            if (departmentToDelete == null)
+            var lockerToDelete = await _context.ParcelLockers.FirstOrDefaultAsync(ob => ob.Id == id);
+            if (lockerToDelete == null)
             {
-                Messages.Add("Department with certain id was not found");
+                Messages.Add("Locker with certain id was not found");
                 return NotFound(Messages);
             }
 
-            _context.Departments.Remove(departmentToDelete);
+            _context.ParcelLockers.Remove(lockerToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Department deleted succesfully");
+            Messages.Add("Locker deleted succesfully");
             return Ok(Messages);
         }
-
 
         [HttpPost]
-        public async Task<ActionResult> Add([FromBody]Department department)
+        public async Task<ActionResult> Add([FromBody]ParcelLocker locker)
         {
             List<string> Messages = new List<string>();
-            if (department == null)
+            if (locker == null)
             {
-                Messages.Add("Recived department is null");
+                Messages.Add("Recived loecker is null");
                 return NotFound(Messages);
             }
-            Department NewDepartment = department;
 
+            ParcelLocker NewLocker= locker;
 
-            await _context.AddAsync(NewDepartment);
+            var street = await _context.Streets.FirstOrDefaultAsync(ob => ob.Id == locker.StreetId);
+
+            if (street == null)
+                Messages.Add("Choosed street doesnt exist");
+
+            locker.street = street;
+
+            await _context.AddAsync(NewLocker);
             await _context.SaveChangesAsync();
-            Messages.Add("Department added succesfully");
+            Messages.Add("Locker added succesfully");
             return Ok(Messages);
         }
-
     }
 }

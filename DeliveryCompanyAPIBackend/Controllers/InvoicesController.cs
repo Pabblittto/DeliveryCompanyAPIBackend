@@ -44,7 +44,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
         }
 
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<Invoice>>> GetInvoices(int amount, int page)
+        public async Task<ActionResult<ICollection<Invoice>>> GetMany(int amount, int page)
         {
             if (amount == 0)
             {
@@ -82,7 +82,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 {
                     List<string> Messages = new List<string>()
                 {
-                    "There is no Invoice to display"
+                    "There are no Invoices to display"
                 };
                     return NotFound(Messages);
                 }

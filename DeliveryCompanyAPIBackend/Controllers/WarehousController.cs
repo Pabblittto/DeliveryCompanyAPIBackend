@@ -11,11 +11,11 @@ namespace DeliveryCompanyAPIBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ContractsController : ControllerBase
+    public class WarehousController : ControllerBase
     {
         private readonly CompanyContext _context;
 
-        public ContractsController(CompanyContext context)
+        public WarehousController(CompanyContext context)
         {
             _context = context;
         }
@@ -23,28 +23,27 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAmount()
         {
-            var amount = await _context.Contracts.CountAsync();
+            var amount = await _context.Warehouses.CountAsync();
             return Ok(amount);
         }
 
-        [HttpGet("{id}")]// api/Contracts/id
-        public async Task<ActionResult<Contract>> Get(int id)
+        [HttpGet("{id}")]// api/departments/id
+        public async Task<ActionResult<Warehous>> Get(int id)
         {
-            var contract = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
+            var warehouse = await _context.Warehouses.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (contract == null)
+            if (warehouse == null)
             {
                 List<string> Messages = new List<string>();
-                Messages.Add($"Contract with certain id={id} not found");
+                Messages.Add($"Warehouse with certain id={id} not found");
                 return NotFound(Messages);
             }
 
-            return Ok(contract);
+            return Ok(warehouse);
         }
 
-
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<Contract>>> GetMany(int amount, int page)
+        public async Task<ActionResult<ICollection<Warehous>>> GetMany(int amount, int page)
         {
             if (amount == 0)
             {
@@ -52,15 +51,15 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 return NotFound(Messages);
             }
 
-            List<Contract> PartOfContracts = await _context.Contracts.ToListAsync();// get all list
+            List<Warehous> partOfWarehouses = await _context.Warehouses.ToListAsync();// get all list
             try
             {
-                if (PartOfContracts.Count != 0)// there is something in this list
+                if (partOfWarehouses.Count != 0)// there is something in this list
                 {
 
-                    if (PartOfContracts.Count < (page) * amount)// if there is less elemnts for one page - take less elements
+                    if (partOfWarehouses.Count < (page) * amount)// if there is less elemnts for one page - take less elements
                     {
-                        int amount2 = PartOfContracts.Count - (page - 1) * amount;// number of elements less than it should be
+                        int amount2 = partOfWarehouses.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
                             List<string> Messages = new List<string>()
@@ -69,19 +68,19 @@ namespace DeliveryCompanyAPIBackend.Controllers
                             };
                             return NotFound(Messages);
                         }
-                        PartOfContracts = PartOfContracts.GetRange((page - 1) * amount, amount2);
+                        partOfWarehouses = partOfWarehouses.GetRange((page - 1) * amount, amount2);
                     }
                     else
                     {
-                        PartOfContracts = PartOfContracts.GetRange((page - 1) * amount, amount);
+                        partOfWarehouses = partOfWarehouses.GetRange((page - 1) * amount, amount);
                     }
-                    return Ok(PartOfContracts);
+                    return Ok(partOfWarehouses);
                 }
                 else
                 {
                     List<string> Messages = new List<string>()
                 {
-                    "There are no Contracts to display"
+                    "There are no warehouses to display"
                 };
                     return NotFound(Messages);
                 }
@@ -90,39 +89,41 @@ namespace DeliveryCompanyAPIBackend.Controllers
             {
                 List<string> Messages = new List<string>();
                 Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
+                Messages.Add(e.Message);
                 return NotFound(Messages);
             }
-
         }
 
 
-        [HttpPatch("{id}")]// api/Contracts/Update
-        public async Task<ActionResult> Update(int id, [FromBody] Contract UpContract)
+        [HttpPatch("{id}")]// api/Streets/Update
+        public async Task<ActionResult> Update(int id, [FromBody] Warehous UpWarehouse)
         {
 
             List<string> Messages = new List<string>();
 
-            if (id == 0 || UpContract == null)
+            if (id == 0 || UpWarehouse == null)
             {
-                Messages.Add("ID or Contract object is null");
+                Messages.Add("ID or Warehouse object is null");
                 return BadRequest(Messages);
             }
 
-            var contract = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
-            if (contract != null)
-            {
-                if (contract.Data != UpContract.Data) { contract.Data = UpContract.Data; }
-                if (contract.FilePath != UpContract.FilePath) { contract.FilePath = UpContract.FilePath; }
-                if (contract.WorkerId != UpContract.WorkerId) { contract.WorkerId = UpContract.WorkerId; }
+            Warehous warehouse = await _context.Warehouses.FirstOrDefaultAsync(ob => ob.Id == id);
 
-                var worker = await  _context.Workers.FirstOrDefaultAsync(ob => ob.Id == UpContract.WorkerId);
-                if (worker == null)
+
+            if (warehouse != null)
+            {
+                if (warehouse.HouseNumber != UpWarehouse.HouseNumber) { warehouse.HouseNumber = UpWarehouse.HouseNumber; }
+                if (warehouse.Street != UpWarehouse.Street) { warehouse.Street = UpWarehouse.Street; }
+                if (warehouse.DepartmentId != UpWarehouse.DepartmentId) { warehouse.DepartmentId = UpWarehouse.DepartmentId; }
+
+                var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == UpWarehouse.DepartmentId);
+
+                if (department == null)
                 {
-                    Messages.Add("There are no worker with given id");
+                    Messages.Add($"Given department with id={id} doesnt exist");
                     return NotFound(Messages);
                 }
-
-                contract.Worker = worker;
+                warehouse.department = department;
 
                 try
                 {
@@ -130,7 +131,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Contract updated succesfully");
+                        Messages.Add("Warehouse updated succesfully");
                         return Ok(Messages);
                     }
                     else
@@ -145,61 +146,58 @@ namespace DeliveryCompanyAPIBackend.Controllers
                     Messages.Add($"Some serous problems occured :c. You send {id} as ID");
                     return NotFound(Messages);
                 }
-
             }
             else
             {
-                Messages.Add($"There is no Contract with certain id={id}");
+                Messages.Add($"There is no warehouse with certain id={id}");
                 return NotFound(Messages);
             }
         }
-
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             List<string> Messages = new List<string>();
-            var contractToDlete = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
-            if (contractToDlete == null)
+            var warehouseToDelete = await _context.Warehouses.FirstOrDefaultAsync(ob => ob.Id == id);
+            if (warehouseToDelete == null)
             {
-                Messages.Add("Contract with certain id was not found");
+                Messages.Add("Warehouse with certain name was not found");
                 return NotFound(Messages);
             }
 
-            _context.Contracts.Remove(contractToDlete);
+            _context.Warehouses.Remove(warehouseToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Car deleted succesfully");
+            Messages.Add("Warehouse deleted succesfully");
             return Ok(Messages);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Add([FromBody]Contract contract)
+        public async Task<ActionResult> Add([FromBody]Warehous warehouse)
         {
             List<string> Messages = new List<string>();
-            if (contract == null)
+            if (warehouse == null)
             {
-                Messages.Add("Recived contract is null");
-                return NotFound(Messages);
-            }
-            Contract NewContract = contract;
-
-            Worker worker = await _context.Workers.FirstOrDefaultAsync(ob => ob.Id == contract.WorkerId);
-
-            if (worker == null)
-            {
-                Messages.Add("You can not add Contract to worker, which doesnt exists");
+                Messages.Add("Recived warehouse is null");
                 return NotFound(Messages);
             }
 
-            NewContract.Worker = worker;
+            Warehous NewWarehouse = warehouse;
 
-            await _context.AddAsync(NewContract);
+            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == warehoue.DepartmentId);
+
+            if (department == null)
+            {
+                Messages.Add($"Choosed department (id={warehouse.DepartmentId}) doesnt exist");
+                return NotFound(Messages);
+            }
+
+            await _context.AddAsync(NewWarehouse);
             await _context.SaveChangesAsync();
-
-            Messages.Add("Contract added succesfully");
+            Messages.Add("Warehouse added succesfully");
             return Ok(Messages);
         }
+
 
     }
 }

@@ -9,13 +9,13 @@ using DeliveryCompanyAPIBackend.Models;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentsController : ControllerBase
+    public class PacksController : ControllerBase
     {
         private readonly CompanyContext _context;
 
-        public DepartmentsController(CompanyContext context)
+        public PacksController(CompanyContext context)
         {
             _context = context;
         }
@@ -23,28 +23,28 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAmount()
         {
-            var amount = await _context.Departments.CountAsync();
+            var amount = await _context.Packs.CountAsync();
             return Ok(amount);
         }
 
-        [HttpGet("{id}")]// api/departments/id
-        public async Task<ActionResult<Department>> Get(int id)
-        {
-            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (department == null)
+        [HttpGet("{id}")]// api/departments/id
+        public async Task<ActionResult<Pack>> Get(int id)
+        {
+            var pack = await _context.Packs.FirstOrDefaultAsync(ob => ob.Id == id);
+
+            if (pack == null)
             {
                 List<string> Messages = new List<string>();
-                Messages.Add($"Department with certain id={id} not found");
+                Messages.Add($"Pack with certain id={id} not found");
                 return NotFound(Messages);
             }
 
-            return Ok(department);
+            return Ok(pack);
         }
 
-
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<Department>>> GetMany(int amount, int page)
+        public async Task<ActionResult<ICollection<Pack>>> GetMany(int amount, int page)
         {
             if (amount == 0)
             {
@@ -52,16 +52,16 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 return NotFound(Messages);
             }
 
-            List<Department> PartOfDepartments = await _context.Departments.ToListAsync();// get all list
+            List<Pack> PartOfPacks = await _context.Packs.ToListAsync();// get all list
             try
             {
-                if (PartOfDepartments.Count != 0)// there is something in this list
+                if (PartOfPacks.Count != 0)// there is something in this list
                 {
                     //page-=1;// because index is counted from 0
 
-                    if (PartOfDepartments.Count < (page) * amount)// if there is less elemnts for one page - take less elements
+                    if (PartOfPacks.Count < (page) * amount)// if there is less elemnts for one page - take less elements
                     {
-                        int amount2 = PartOfDepartments.Count - (page - 1) * amount;// number of elements less than it should be
+                        int amount2 = PartOfPacks.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
                             List<string> Messages = new List<string>()
@@ -70,19 +70,19 @@ namespace DeliveryCompanyAPIBackend.Controllers
                             };
                             return NotFound(Messages);
                         }
-                        PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount2);
+                        PartOfPacks = PartOfPacks.GetRange((page - 1) * amount, amount2);
                     }
                     else
                     {
-                        PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount);
+                        PartOfPacks = PartOfPacks.GetRange((page - 1) * amount, amount);
                     }
-                    return Ok(PartOfDepartments);
+                    return Ok(PartOfPacks);
                 }
                 else
                 {
                     List<string> Messages = new List<string>()
                 {
-                    "There are no Departments to display"
+                    "There are no Packs to display"
                 };
                     return NotFound(Messages);
                 }
@@ -96,29 +96,36 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
         }
 
-        [HttpPatch("{id}")]// api/Departments/Update
-        public async Task<ActionResult> Update(int id,[FromBody] Department UpDepartment)
+        [HttpPatch("{id}")]// api/Packs/Update
+        public async Task<ActionResult> Update(int id, [FromBody] Pack UpPack)
         {
 
             List<string> Messages = new List<string>();
 
-            if (id == 0 || UpDepartment == null)
+            if (id == 0 || UpPack == null)
             {
-                Messages.Add("ID or Department object is null");
+                Messages.Add("ID or Pack object is null");
                 return BadRequest(Messages);
             }
 
-            var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
+            var pack = await _context.Packs.FirstOrDefaultAsync(ob => ob.Id == id);
 
-            if (department != null)
+            if (pack != null)
             {
-                if (department.BankAccountNo != UpDepartment.BankAccountNo) { department.BankAccountNo = UpDepartment.BankAccountNo; }
-                if (department.BuildingNo != UpDepartment.BuildingNo) { department.BuildingNo = UpDepartment.BuildingNo; }
-                if (department.ManagerTelNo != UpDepartment.ManagerTelNo) { department.ManagerTelNo = UpDepartment.ManagerTelNo; }
-                if (department.OfficeTelNo != UpDepartment.OfficeTelNo) { department.OfficeTelNo = UpDepartment.OfficeTelNo; }
-                if (department.Street != UpDepartment.Street) { department.Street = UpDepartment.Street; }
-                if (department.Name != UpDepartment.Name) { department.Name = UpDepartment.Name; }
 
+                if (pack.Height != UpPack.Height) { pack.Height = UpPack.Height; }
+                if (pack.Weight != UpPack.Weight) { pack.Weight = UpPack.Weight; }
+                if (pack.PackTypeId != UpPack.PackTypeId) { pack.PackTypeId = UpPack.PackTypeId; }
+
+                var packType = await _context.PackTypes.FirstOrDefaultAsync(ob => ob.Name == UpPack.PackTypeId);
+
+                if (packType == null)
+                {
+                    Messages.Add($"There is no pack type with given Name={UpPack.PackTypeId}");
+                    return NotFound(Messages);
+                }
+
+                pack.type = packType;
 
                 try
                 {
@@ -126,7 +133,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Department updated succesfully");
+                        Messages.Add("Pack updated succesfully");
                         return Ok(Messages);
                     }
                     else
@@ -144,7 +151,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
             }
             else
             {
-                Messages.Add($"There is no department with certain id={id}");
+                Messages.Add($"There is no pack with certain id={id}");
                 return NotFound(Messages);
             }
         }
@@ -153,38 +160,46 @@ namespace DeliveryCompanyAPIBackend.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             List<string> Messages = new List<string>();
-            var departmentToDelete = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
-            if (departmentToDelete == null)
+            var packToDelete = await _context.Packs.FirstOrDefaultAsync(ob => ob.Id == id);
+            if (packToDelete == null)
             {
-                Messages.Add("Department with certain id was not found");
+                Messages.Add("Pack with certain id was not found");
                 return NotFound(Messages);
             }
 
-            _context.Departments.Remove(departmentToDelete);
+            _context.Packs.Remove(packToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Department deleted succesfully");
+            Messages.Add("Pack deleted succesfully");
             return Ok(Messages);
         }
 
 
         [HttpPost]
-        public async Task<ActionResult> Add([FromBody]Department department)
+        public async Task<ActionResult> Add([FromBody]Pack pack)
         {
             List<string> Messages = new List<string>();
-            if (department == null)
+            if (pack == null)
             {
-                Messages.Add("Recived department is null");
+                Messages.Add("Recived pack is null");
                 return NotFound(Messages);
             }
-            Department NewDepartment = department;
 
+            Pack NewPack = pack;
 
-            await _context.AddAsync(NewDepartment);
+            var packtype = await _context.PackTypes.FirstOrDefaultAsync(ob => ob.Name == pack.PackTypeId);
+
+            if (packtype == null)
+                Messages.Add("Choosed pack type doesnt exist");
+
+            NewPack.type = packtype;
+
+            await _context.AddAsync(NewPack);
             await _context.SaveChangesAsync();
-            Messages.Add("Department added succesfully");
+            Messages.Add("Pack added succesfully");
             return Ok(Messages);
         }
+
 
     }
 }

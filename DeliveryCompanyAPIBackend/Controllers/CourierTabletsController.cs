@@ -44,7 +44,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
         }
 
         [HttpGet("am={amount}/pg={page}")]
-        public async Task<ActionResult<ICollection<CourierTablet>>> GetCourierTablets(int amount, int page)
+        public async Task<ActionResult<ICollection<CourierTablet>>> GetMany(int amount, int page)
         {
             if (amount == 0)
             {
@@ -81,7 +81,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 {
                     List<string> Messages = new List<string>()
                 {
-                    "There is no Courier Tablets to display"
+                    "There are no Courier Tablets to display"
                 };
                     return NotFound(Messages);
                 }
@@ -201,86 +201,6 @@ namespace DeliveryCompanyAPIBackend.Controllers
         }
 
 
-        //// GET: api/CourierTablets
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<CourierTablet>>> GetCourierTablets()
-        //{
-        //    return await _context.CourierTablets.ToListAsync();
-        //}
-
-        //// GET: api/CourierTablets/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<CourierTablet>> GetCourierTablet(int id)
-        //{
-        //    var courierTablet = await _context.CourierTablets.FindAsync(id);
-
-        //    if (courierTablet == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return courierTablet;
-        //}
-
-        //// PUT: api/CourierTablets/5
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutCourierTablet(int id, CourierTablet courierTablet)
-        //{
-        //    if (id != courierTablet.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(courierTablet).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!CourierTabletExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
-        //// POST: api/CourierTablets
-        //[HttpPost]
-        //public async Task<ActionResult<CourierTablet>> PostCourierTablet(CourierTablet courierTablet)
-        //{
-        //    _context.CourierTablets.Add(courierTablet);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetCourierTablet", new { id = courierTablet.Id }, courierTablet);
-        //}
-
-        //// DELETE: api/CourierTablets/5
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult<CourierTablet>> DeleteCourierTablet(int id)
-        //{
-        //    var courierTablet = await _context.CourierTablets.FindAsync(id);
-        //    if (courierTablet == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.CourierTablets.Remove(courierTablet);
-        //    await _context.SaveChangesAsync();
-
-        //    return courierTablet;
-        //}
-
-        //private bool CourierTabletExists(int id)
-        //{
-        //    return _context.CourierTablets.Any(e => e.Id == id);
-        //}
+       
     }
 }
