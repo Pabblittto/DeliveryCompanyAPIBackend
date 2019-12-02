@@ -183,12 +183,14 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             Street NewStreet = street;
 
-            var region = _context.Regions.FirstOrDefaultAsync(ob => ob.Id == street.RegionId);
+            var region = await  _context.Regions.FirstOrDefaultAsync(ob => ob.Id == street.RegionId);
             if (region == null)
             {
                 Messages.Add($"Choosed region (id={street.RegionId}) doesnt exist");
                 return NotFound(Messages);
             }
+
+            NewStreet.region = region;
 
             await _context.AddAsync(NewStreet);
             await _context.SaveChangesAsync();

@@ -187,7 +187,11 @@ namespace DeliveryCompanyAPIBackend.Controllers
             var street = await _context.Streets.FirstOrDefaultAsync(ob => ob.Id == locker.StreetId);
 
             if (street == null)
+            {
                 Messages.Add("Choosed street doesnt exist");
+                return NotFound(Messages);
+            }
+                
 
             locker.street = street;
 

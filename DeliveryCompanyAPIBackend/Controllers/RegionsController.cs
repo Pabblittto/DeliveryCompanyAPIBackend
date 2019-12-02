@@ -188,6 +188,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 Messages.Add("You can not add region to a department, which doesnt exists");
                 return NotFound(Messages);
             }
+            NewRegion.department = department;
 
             await _context.AddAsync(NewRegion);
             await _context.SaveChangesAsync();
