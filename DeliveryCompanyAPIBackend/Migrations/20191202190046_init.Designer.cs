@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeliveryCompanyAPIBackend.Migrations
 {
     [DbContext(typeof(CompanyContext))]
-    [Migration("20191115142922_addedIdentity")]
-    partial class addedIdentity
+    [Migration("20191202190046_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,6 +41,41 @@ namespace DeliveryCompanyAPIBackend.Migrations
                     b.ToTable("Cars");
                 });
 
+            modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Chamber", b =>
+                {
+                    b.Property<int>("ChamberTypeID");
+
+                    b.Property<int>("ParcelLockerID");
+
+                    b.Property<int>("Amount");
+
+                    b.Property<int>("FreeAmount");
+
+                    b.Property<string>("chamberTypeTypeName");
+
+                    b.HasKey("ChamberTypeID", "ParcelLockerID");
+
+                    b.HasIndex("ParcelLockerID");
+
+                    b.HasIndex("chamberTypeTypeName");
+
+                    b.ToTable("Chambers");
+                });
+
+            modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.ChamberType", b =>
+                {
+                    b.Property<string>("TypeName")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Height");
+
+                    b.Property<int>("Width");
+
+                    b.HasKey("TypeName");
+
+                    b.ToTable("ChamberTypes");
+                });
+
             modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Contract", b =>
                 {
                     b.Property<int>("Id")
@@ -54,8 +89,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WorkerId")
-                        .IsUnique();
+                    b.HasIndex("WorkerId");
 
                     b.ToTable("Contracts");
                 });
@@ -189,10 +223,6 @@ namespace DeliveryCompanyAPIBackend.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<int>("CellsAmount");
-
-                    b.Property<int>("FreeCells");
 
                     b.Property<int>("StreetId");
 
@@ -480,11 +510,23 @@ namespace DeliveryCompanyAPIBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Chamber", b =>
+                {
+                    b.HasOne("DeliveryCompanyAPIBackend.Models.ParcelLocker", "parcelLocker")
+                        .WithMany("chambers")
+                        .HasForeignKey("ParcelLockerID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DeliveryCompanyAPIBackend.Models.ChamberType", "chamberType")
+                        .WithMany("chambers")
+                        .HasForeignKey("chamberTypeTypeName");
+                });
+
             modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Contract", b =>
                 {
-                    b.HasOne("DeliveryCompanyAPIBackend.Models.Worker", "Worker")
-                        .WithOne("contract")
-                        .HasForeignKey("DeliveryCompanyAPIBackend.Models.Contract", "WorkerId")
+                    b.HasOne("DeliveryCompanyAPIBackend.Models.Worker", "worker")
+                        .WithMany("Contracts")
+                        .HasForeignKey("WorkerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

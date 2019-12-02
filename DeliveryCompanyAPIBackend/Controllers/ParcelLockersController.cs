@@ -111,8 +111,6 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (locker != null)
             {
-                if (locker.CellsAmount != UpLocker.CellsAmount) { locker.CellsAmount = UpLocker.CellsAmount; }
-                if (locker.FreeCells != UpLocker.FreeCells) { locker.FreeCells = UpLocker.FreeCells; }
                 if (locker.StreetId != UpLocker.StreetId) { locker.StreetId = UpLocker.StreetId; }
 
                 var street = await _context.Streets.FirstOrDefaultAsync(ob => ob.Id == UpLocker.StreetId);

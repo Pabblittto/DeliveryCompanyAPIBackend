@@ -122,7 +122,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
                     return NotFound(Messages);
                 }
 
-                contract.Worker = worker;
+                contract.worker = worker;
 
                 try
                 {
@@ -192,7 +192,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 return NotFound(Messages);
             }
 
-            NewContract.Worker = worker;
+            NewContract.worker = worker;
 
             await _context.AddAsync(NewContract);
             await _context.SaveChangesAsync();

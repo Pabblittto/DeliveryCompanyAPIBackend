@@ -20,6 +20,6 @@ namespace DeliveryCompanyAPIBackend.Models
         public string PositionId { get; set; }
         public Position position { get; set; }
 
-        public Contract contract { get; set; }// need by convention
+        public ICollection<Contract> Contracts { get; set; }// need by convention
     }
 }

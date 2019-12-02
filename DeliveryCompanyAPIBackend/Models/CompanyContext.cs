@@ -39,6 +39,9 @@ namespace DeliveryCompanyAPIBackend.Models
                 .WithMany(obj => obj.BeeingSender)
                 .HasForeignKey(obj => obj.SenderId);
 
+            builder.Entity<Chamber>()
+                .HasKey(ob => new { ob.ChamberTypeID, ob.ParcelLockerID });
+
         }
 
 
@@ -57,6 +60,8 @@ namespace DeliveryCompanyAPIBackend.Models
         public DbSet<Street> Streets { get; set; }
         public DbSet<Warehous> Warehouses { get; set; }
         public DbSet<Worker> Workers { get; set; }
+        public DbSet<Chamber> Chambers { get; set; }
+        public DbSet<ChamberType> ChamberTypes { get; set; }
 
     }
 }

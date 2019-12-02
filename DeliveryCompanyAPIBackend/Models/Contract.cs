@@ -12,7 +12,7 @@ namespace DeliveryCompanyAPIBackend.Models
         public int Id { get; set; }
 
         public int WorkerId { get; set; }
-        public Worker Worker { get; set; }
+        public Worker worker { get; set; }
 
         public DataType Data { get; set; }
         public string FilePath { get; set; }

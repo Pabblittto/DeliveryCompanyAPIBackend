@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace DeliveryCompanyAPIBackend.Models
 {
-    public class ParcelLocker// paczkomat
+    public class ChamberType
     {
         [Key]
-        public int Id { get; set; }
-        
-        public int StreetId { get; set; }
-        public Street street { get; set; }
+        public string TypeName { get; set; }
+
+        public int Height { get; set; }
+        public int Width { get; set; }
 
         public ICollection<Chamber> chambers { get; set; }
     }
