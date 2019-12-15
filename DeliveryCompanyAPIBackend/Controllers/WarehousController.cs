@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DeliveryCompanyAPIBackend.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/warehouses")]
     [ApiController]
+    [EnableCors("MyDomain")]
     public class WarehousController : ControllerBase
     {
         private readonly CompanyContext _context;

@@ -13,8 +13,9 @@ namespace DeliveryCompanyAPIBackend.Models
 
         public string PackTypeId { get; set; }
         public PackType type { get; set; }
-
+        [Required]
         public int Weight { get; set; }
+        [Required]
         public int Height { get; set; }
         public Order order { get; set; }
     }

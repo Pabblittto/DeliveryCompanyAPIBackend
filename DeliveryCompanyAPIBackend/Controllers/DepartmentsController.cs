@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DeliveryCompanyAPIBackend.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyDomain")]
     public class DepartmentsController : ControllerBase
     {
         private readonly CompanyContext _context;
@@ -171,19 +173,18 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpPost]
         public async Task<ActionResult> Add([FromBody]Department department)
         {
-            List<string> Messages = new List<string>();
             if (department == null)
             {
-                Messages.Add("Recived department is null");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Recived department is null");
+                return NotFound(ModelState);
             }
             Department NewDepartment = department;
 
 
             await _context.AddAsync(NewDepartment);
             await _context.SaveChangesAsync();
-            Messages.Add("Department added succesfully");
-            return Ok(Messages);
+            string okMessage = "Department added succesfully";
+            return Ok(okMessage);
         }
 
     }

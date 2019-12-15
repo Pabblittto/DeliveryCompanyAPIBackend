@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DeliveryCompanyAPIBackend.Models
 {
-    public class CourierTablet
+    public class CourierTablet   // to do wywaleniAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA w choloere
     {
         [Key]
         public int Id { get; set; }

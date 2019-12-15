@@ -10,8 +10,10 @@ namespace DeliveryCompanyAPIBackend.Models
     {
         [Key]
         public string TypeName { get; set; }
-
+        [Required]
         public int Height { get; set; }
+        [Required]
+
         public int Width { get; set; }
 
         public ICollection<Chamber> chambers { get; set; }

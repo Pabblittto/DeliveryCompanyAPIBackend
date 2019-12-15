@@ -11,10 +11,13 @@ namespace DeliveryCompanyAPIBackend.Models
         [Key]
         public int Id { get; set; }
 
+        [Required]
         public int WorkerId { get; set; }
         public Worker worker { get; set; }
 
-        public DataType Data { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
+        [Required]
         public string FilePath { get; set; }
 
     }

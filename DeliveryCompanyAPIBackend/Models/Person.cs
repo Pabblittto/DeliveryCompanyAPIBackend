@@ -11,12 +11,17 @@ namespace DeliveryCompanyAPIBackend.Models
     {
         [Key]
         public int Id { get; set; }
-
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Surname { get; set; }
+        [Required]
         public string City { get; set; }
+        [Required]
         public string Street { get; set; }
+        [Required]
         public int BuildingNo { get; set; }
+        [Required]
         public string TelNo { get; set; }
 
         

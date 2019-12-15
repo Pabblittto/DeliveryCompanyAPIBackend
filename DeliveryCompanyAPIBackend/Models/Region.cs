@@ -10,6 +10,7 @@ namespace DeliveryCompanyAPIBackend.Models
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public string CityName { get; set; }
 
         public int DepartmentId { get; set; }

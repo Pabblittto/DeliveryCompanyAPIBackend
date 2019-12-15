@@ -10,12 +10,18 @@ namespace DeliveryCompanyAPIBackend.Models
     { 
         [Key]
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public int BankAccountNo { get; set; }
 
+        [Required]
         public string Street { get; set; }
+        [Required]
         public int BuildingNo { get; set; }
+        [Required]
         public string OfficeTelNo { get; set; }
+        [Required]
         public string ManagerTelNo { get; set; }
 
 
@@ -23,9 +29,9 @@ namespace DeliveryCompanyAPIBackend.Models
         public ICollection<Car> Cars { get; set; }
         public ICollection<Warehous> Warehouses { get; set;} 
         public ICollection<CourierTablet> courierTablets { get; set; }
-        public ICollection<Invoice> invoices { get; set; }
-        public ICollection<Order> orders { get; set; }
-        public ICollection<Region> regions { get; set; }
-        public ICollection<Worker> workers { get; set; }
+        public ICollection<Invoice> Invoices { get; set; }
+        public ICollection<Order> Orders { get; set; }
+        public ICollection<Region> Regions { get; set; }
+        public ICollection<Worker> Workers { get; set; }
     }
 }

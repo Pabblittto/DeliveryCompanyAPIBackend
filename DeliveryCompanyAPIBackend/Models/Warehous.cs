@@ -14,8 +14,9 @@ namespace DeliveryCompanyAPIBackend.Models
 
         public int DepartmentId { get; set; }
         public Department department { get; set; }
-
+        [Required]
         public string Street { get; set; }
+        [Required]
         public int HouseNumber { get; set; }
     }
 }

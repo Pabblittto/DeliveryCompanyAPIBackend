@@ -10,12 +10,14 @@ namespace DeliveryCompanyAPIBackend.Models
     {
         [Key]
         public int Id { get; set; }
-
+        [Required]
         public int DepartmentId { get; set; }
         public Department department { get; set; }
 
-        public DataType data { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
         public string Description { get; set; }
+        [Required]
         public string FilePath { get; set; }
 
     }

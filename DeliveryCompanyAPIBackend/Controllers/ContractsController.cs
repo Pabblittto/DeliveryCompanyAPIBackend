@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DeliveryCompanyAPIBackend.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyDomain")]
     public class ContractsController : ControllerBase
     {
         private readonly CompanyContext _context;
@@ -111,7 +113,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
             var contract = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
             if (contract != null)
             {
-                if (contract.Data != UpContract.Data) { contract.Data = UpContract.Data; }
+                if (contract.Date != UpContract.Date) { contract.Date = UpContract.Date; }
                 if (contract.FilePath != UpContract.FilePath) { contract.FilePath = UpContract.FilePath; }
                 if (contract.WorkerId != UpContract.WorkerId) { contract.WorkerId = UpContract.WorkerId; }
 

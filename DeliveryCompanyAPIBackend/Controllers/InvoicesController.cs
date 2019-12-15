@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DeliveryCompanyAPIBackend.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace DeliveryCompanyAPIBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyDomain")]
     public class InvoicesController : ControllerBase
     {
         private readonly CompanyContext _context;
@@ -114,7 +116,7 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 if (invoice.FilePath != UpInvoice.FilePath) { invoice.FilePath = UpInvoice.FilePath; }
                 if (invoice.DepartmentId != UpInvoice.DepartmentId) { invoice.DepartmentId = UpInvoice.DepartmentId; }
                 if (invoice.Description != UpInvoice.Description) { invoice.Description = UpInvoice.Description; }
-                if (invoice.data != UpInvoice.data) { invoice.data = UpInvoice.data; }
+                if (invoice.Date != UpInvoice.Date) { invoice.Date = UpInvoice.Date; }
 
                 var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == UpInvoice.DepartmentId);
 

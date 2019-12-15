@@ -3,14 +3,16 @@ using System;
 using DeliveryCompanyAPIBackend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DeliveryCompanyAPIBackend.Migrations
 {
     [DbContext(typeof(CompanyContext))]
-    partial class CompanyContextModelSnapshot : ModelSnapshot
+    [Migration("20191210105056_DateChange")]
+    partial class DateChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,11 +26,9 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<int>("DepartmentId");
 
-                    b.Property<string>("Mark")
-                        .IsRequired();
+                    b.Property<string>("Mark");
 
-                    b.Property<string>("Model")
-                        .IsRequired();
+                    b.Property<string>("Model");
 
                     b.Property<int>("PolicyNumber");
 
@@ -83,8 +83,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<DateTime>("Date");
 
-                    b.Property<string>("FilePath")
-                        .IsRequired();
+                    b.Property<string>("FilePath");
 
                     b.Property<int>("WorkerId");
 
@@ -124,17 +123,13 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<int>("BuildingNo");
 
-                    b.Property<string>("ManagerTelNo")
-                        .IsRequired();
+                    b.Property<string>("ManagerTelNo");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
-                    b.Property<string>("OfficeTelNo")
-                        .IsRequired();
+                    b.Property<string>("OfficeTelNo");
 
-                    b.Property<string>("Street")
-                        .IsRequired();
+                    b.Property<string>("Street");
 
                     b.HasKey("Id");
 
@@ -146,14 +141,13 @@ namespace DeliveryCompanyAPIBackend.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("Date");
-
                     b.Property<int>("DepartmentId");
 
                     b.Property<string>("Description");
 
-                    b.Property<string>("FilePath")
-                        .IsRequired();
+                    b.Property<string>("FilePath");
+
+                    b.Property<int>("data");
 
                     b.HasKey("Id");
 
@@ -246,20 +240,15 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<int>("BuildingNo");
 
-                    b.Property<string>("City")
-                        .IsRequired();
+                    b.Property<string>("City");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
-                    b.Property<string>("Street")
-                        .IsRequired();
+                    b.Property<string>("Street");
 
-                    b.Property<string>("Surname")
-                        .IsRequired();
+                    b.Property<string>("Surname");
 
-                    b.Property<string>("TelNo")
-                        .IsRequired();
+                    b.Property<string>("TelNo");
 
                     b.HasKey("Id");
 
@@ -285,8 +274,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("CityName")
-                        .IsRequired();
+                    b.Property<string>("CityName");
 
                     b.Property<int>("DepartmentId");
 
@@ -304,8 +292,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<int>("RegionId");
 
-                    b.Property<string>("StreetName")
-                        .IsRequired();
+                    b.Property<string>("StreetName");
 
                     b.HasKey("Id");
 
@@ -323,8 +310,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<int>("HouseNumber");
 
-                    b.Property<string>("Street")
-                        .IsRequired();
+                    b.Property<string>("Street");
 
                     b.HasKey("Id");
 
@@ -340,13 +326,11 @@ namespace DeliveryCompanyAPIBackend.Migrations
 
                     b.Property<int>("DepartmentId");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
                     b.Property<string>("PositionId");
 
-                    b.Property<string>("Surname")
-                        .IsRequired();
+                    b.Property<string>("Surname");
 
                     b.HasKey("Id");
 
@@ -557,7 +541,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
             modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Invoice", b =>
                 {
                     b.HasOne("DeliveryCompanyAPIBackend.Models.Department", "department")
-                        .WithMany("Invoices")
+                        .WithMany("invoices")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -565,7 +549,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
             modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Order", b =>
                 {
                     b.HasOne("DeliveryCompanyAPIBackend.Models.Department", "department")
-                        .WithMany("Orders")
+                        .WithMany("orders")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -603,7 +587,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
             modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Region", b =>
                 {
                     b.HasOne("DeliveryCompanyAPIBackend.Models.Department", "department")
-                        .WithMany("Regions")
+                        .WithMany("regions")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -627,7 +611,7 @@ namespace DeliveryCompanyAPIBackend.Migrations
             modelBuilder.Entity("DeliveryCompanyAPIBackend.Models.Worker", b =>
                 {
                     b.HasOne("DeliveryCompanyAPIBackend.Models.Department", "department")
-                        .WithMany("Workers")
+                        .WithMany("workers")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade);
 
