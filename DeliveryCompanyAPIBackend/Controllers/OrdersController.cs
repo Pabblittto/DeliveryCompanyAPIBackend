@@ -37,9 +37,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (order == null)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Order with certain id={id} not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"Order with certain id={id} not found");
+                return NotFound(ModelState);
             }
 
             return Ok(order);
@@ -51,8 +50,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
         {
             if (amount == 0)
             {
-                List<string> Messages = new List<string>() { "Problems occured. You send amount = 0" };
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Problems occured. You send amount = 0");
+                return NotFound(ModelState);
             }
 
             List<Order> PartOfOrders = await _context.Orders.ToListAsync();// get all list
@@ -60,18 +59,13 @@ namespace DeliveryCompanyAPIBackend.Controllers
             {
                 if (PartOfOrders.Count != 0)// there is something in this list
                 {
-                    //page-=1;// because index is counted from 0
-
                     if (PartOfOrders.Count < (page) * amount)// if there is less elemnts for one page - take less elements
                     {
                         int amount2 = PartOfOrders.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
-                            List<string> Messages = new List<string>()
-                            {
-                                $"There are too few records in base to create {page} page.(Wrong page number)"
-                            };
-                            return NotFound(Messages);
+                            ModelState.AddModelError("errors", $"There are too few records in base to create {page} page.(Wrong page number)");
+                            return NotFound(ModelState);
                         }
                         PartOfOrders = PartOfOrders.GetRange((page - 1) * amount, amount2);
                     }
@@ -83,18 +77,14 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 }
                 else
                 {
-                    List<string> Messages = new List<string>()
-                {
-                    "There are no Orders to display"
-                };
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors", "There are no Orders to display");
+                    return NotFound(ModelState);
                 }
             }
             catch (Exception e)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"Some seroius problems occured. You send {amount} and {page} as numbers");
+                return NotFound(ModelState);
             }
 
         }
@@ -103,12 +93,10 @@ namespace DeliveryCompanyAPIBackend.Controllers
         public async Task<ActionResult> Update(int id, [FromBody] Order UpOrder)
         {
 
-            List<string> Messages = new List<string>();
-
             if (id == 0 || UpOrder == null)
             {
-                Messages.Add("ID or Department object is null");
-                return BadRequest(Messages);
+                ModelState.AddModelError("errors","ID or Department object is null");
+                return BadRequest(ModelState);
             }
 
             var order = await _context.Orders.FirstOrDefaultAsync(ob => ob.Id == id);
@@ -128,15 +116,16 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 if (department==null || sender==null || receiver == null)// somethig is wrong
                 {
                     if (department == null)
-                        Messages.Add($"There is no department with given id={UpOrder.DepartmentId}");
+                        ModelState.AddModelError("errors", $"There is no department with given id={UpOrder.DepartmentId}");
 
                     if (sender == null)
-                        Messages.Add($"There is no person(sender) with given id={UpOrder.SenderId}");
+                        ModelState.AddModelError("errors", $"There is no person(sender) with given id={UpOrder.SenderId}");
+
 
                     if (receiver == null)
-                        Messages.Add($"There is no person(reciver) with given id={UpOrder.ReciverId}");
+                        ModelState.AddModelError("errors", $"There is no person(reciver) with given id={UpOrder.ReciverId}");
 
-                    return NotFound(Messages);
+                    return NotFound(ModelState);
                 }
                 order.department = department;
                 order.Sender = sender;
@@ -148,26 +137,26 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Order updated succesfully");
-                        return Ok(Messages);
+                        string OkMessage = "Order updated succesfully";
+                        return Ok(OkMessage);
                     }
                     else
                     {
-                        Messages.Add($"{ammount} changes were made");
-                        return Ok(Messages);
+                        string OkMessage = $"{ammount} changes were made";
+                        return Ok(OkMessage);
                     }
 
                 }
                 catch (Exception e)
                 {
-                    Messages.Add($"Some serous problems occured :c. You send {id} as ID");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors",$"Some serous problems occured :c. You send {id} as ID");
+                    return NotFound(ModelState);
                 }
             }
             else
             {
-                Messages.Add($"There is no order with certain id={id}");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"There is no order with certain id={id}");
+                return NotFound(ModelState);
             }
         }
 
@@ -175,29 +164,27 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            List<string> Messages = new List<string>();
             var orderToDelete = await _context.Orders.FirstOrDefaultAsync(ob => ob.Id == id);
             if (orderToDelete == null)
             {
-                Messages.Add("Order with certain id was not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Order with certain id was not found");
+                return NotFound(ModelState);
             }
 
             _context.Orders.Remove(orderToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Department deleted succesfully");
-            return Ok(Messages);
+            string OkMessage = "Department deleted succesfully";
+            return Ok(OkMessage);
         }
 
         [HttpPost]
         public async Task<ActionResult> Add([FromBody]Order order)
         {
-            List<string> Messages = new List<string>();
             if (order == null)
             {
-                Messages.Add("Recived order is null");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Recived order is null");
+                return NotFound(ModelState);
             }
             Order NewOrder = order;
 
@@ -207,19 +194,19 @@ namespace DeliveryCompanyAPIBackend.Controllers
             Department department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == order.DepartmentId);
 
             if (sender == null)
-                Messages.Add("Choosed sender doesnt exist");
+                ModelState.AddModelError("errors","Choosed sender doesnt exist");
 
             if (receiver == null)
-                Messages.Add("Choosed receiver  doesnt exist");
+                ModelState.AddModelError("errors","Choosed receiver  doesnt exist");
 
             if (pack == null)
-                Messages.Add("Choosed pack doesnt exist");
+                ModelState.AddModelError("errors","Choosed pack doesnt exist");
 
             if (department == null)
-                Messages.Add("Choosed department doesnt exist");
+                ModelState.AddModelError("errors","Choosed department doesnt exist");
 
-            if (Messages.Count != 0)
-                return NotFound(Messages);
+            if (ModelState.ErrorCount != 0)
+                return NotFound(ModelState);
 
             order.department = department;
             order.Sender = sender;
@@ -228,8 +215,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             await _context.AddAsync(NewOrder);
             await _context.SaveChangesAsync();
-            Messages.Add("Order added succesfully");
-            return Ok(Messages);
+            string OkMessage = "Order added succesfully";
+            return Ok(OkMessage);
         }
 
         

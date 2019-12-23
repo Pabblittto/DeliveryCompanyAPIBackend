@@ -36,9 +36,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (department == null)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Department with certain id={id} not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"Department with certain id={id} not found");
+                return NotFound(ModelState);
             }
 
             return Ok(department);
@@ -50,8 +49,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
         {
             if (amount == 0)
             {
-                List<string> Messages = new List<string>() { "Problems occured. You send amount = 0" };
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", "Problems occured. You send amount = 0");
+                return NotFound(ModelState);
             }
 
             List<Department> PartOfDepartments = await _context.Departments.ToListAsync();// get all list
@@ -66,11 +65,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
                         int amount2 = PartOfDepartments.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
-                            List<string> Messages = new List<string>()
-                            {
-                                $"There are too few records in base to create {page} page.(Wrong page number)"
-                            };
-                            return NotFound(Messages);
+                            ModelState.AddModelError("errors", $"There are too few records in base to create {page} page.(Wrong page number)");
+                            return NotFound(ModelState);
                         }
                         PartOfDepartments = PartOfDepartments.GetRange((page - 1) * amount, amount2);
                     }
@@ -82,32 +78,25 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 }
                 else
                 {
-                    List<string> Messages = new List<string>()
-                {
-                    "There are no Departments to display"
-                };
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors", "There are no Departments to display");
+                    return NotFound(ModelState);
                 }
             }
             catch (Exception e)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"Some seroius problems occured. You send {amount} and {page} as numbers");
+                return NotFound(ModelState);
             }
-
         }
 
         [HttpPatch("{id}")]// api/Departments/Update
         public async Task<ActionResult> Update(int id,[FromBody] Department UpDepartment)
         {
 
-            List<string> Messages = new List<string>();
-
             if (id == 0 || UpDepartment == null)
             {
-                Messages.Add("ID or Department object is null");
-                return BadRequest(Messages);
+                ModelState.AddModelError("errors","ID or Department object is null");
+                return BadRequest(ModelState);
             }
 
             var department = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
@@ -128,45 +117,46 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Department updated succesfully");
-                        return Ok(Messages);
+                        string OkMessage = "Department updated succesfully";
+                        return Ok(OkMessage);
                     }
                     else
                     {
-                        Messages.Add($"{ammount} changes were made");
-                        return Ok(Messages);
+                        string OkMessage=$"{ammount} changes were made";
+
+                        return Ok(OkMessage);
                     }
 
                 }
                 catch (Exception e)
                 {
-                    Messages.Add($"Some serous problems occured :c. You send {id} as ID");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors",$"Some serous problems occured :c. You send {id} as ID");
+                    return NotFound(ModelState);
                 }
             }
             else
             {
-                Messages.Add($"There is no department with certain id={id}");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"There is no department with certain id={id}");
+                return NotFound(ModelState);
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            List<string> Messages = new List<string>();
             var departmentToDelete = await _context.Departments.FirstOrDefaultAsync(ob => ob.Id == id);
             if (departmentToDelete == null)
             {
-                Messages.Add("Department with certain id was not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", "Department with certain id was not found");
+                return NotFound(ModelState);
             }
 
             _context.Departments.Remove(departmentToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Department deleted succesfully");
-            return Ok(Messages);
+
+            string OkMessage = "Department deleted succesfully";
+            return Ok(OkMessage);
         }
 
 
@@ -183,8 +173,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             await _context.AddAsync(NewDepartment);
             await _context.SaveChangesAsync();
-            string okMessage = "Department added succesfully";
-            return Ok(okMessage);
+            string OkMessage = "Department added succesfully";
+            return Ok(OkMessage);
         }
 
     }

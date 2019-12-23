@@ -37,9 +37,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (car == null)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Car with certain id={id} not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"Car with certain id={id} not found");
+                return NotFound(ModelState);
             }
 
             return Ok(car);
@@ -50,8 +49,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
         {
             if (amount == 0)
             {
-                List<string> Messages = new List<string>() { "Problems occured. You send amount = 0" };
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", "Problems occured. You send amount = 0");
+                return NotFound(ModelState);
             }
 
             List<Car> PartOfCars = await _context.Cars.ToListAsync();// get all list
@@ -66,11 +65,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
                         int amount2 = PartOfCars.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2<0)
                         {
-                            List<string> Messages = new List<string>()
-                            {
-                                $"There are too few records in base to create {page} page.(Wrong page number)"
-                            };
-                            return NotFound(Messages);
+                            ModelState.AddModelError("errors", $"There are too few records in base to create {page} page.(Wrong page number)");
+                            return NotFound(ModelState);
                         }
                         PartOfCars = PartOfCars.GetRange((page - 1) * amount, amount2);
                     }
@@ -82,17 +78,13 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 }
                 else
                 {
-                    List<string> Messages = new List<string>()
-                {
-                    "There are no Cars to display"
-                };
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors", "There are no Cars to display");
+                    return NotFound(ModelState);
                 }
             }catch(Exception e)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"Some seroius problems occured. You send {amount} and {page} as numbers");
+                return NotFound(ModelState);
             }
             
         }
@@ -101,12 +93,10 @@ namespace DeliveryCompanyAPIBackend.Controllers
         public async Task<ActionResult> Update(int id, [FromBody] Car UpCar)
         {
 
-            List<string> Messages = new List<string>();
-
             if(id==0 || UpCar == null)
             {
-                Messages.Add("ID or Car object is null");
-                return BadRequest(Messages);
+                ModelState.AddModelError("errors","ID or Car object is null");
+                return BadRequest(ModelState);
             }
 
             var car = await _context.Cars.FirstOrDefaultAsync(ob => ob.RegistrationNumber == id);
@@ -123,8 +113,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                 if (department == null)
                 {
-                    Messages.Add("There is no dapertment with given id");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors","There is no dapertment with given id");
+                    return NotFound(ModelState);
                 }
 
                 car.Department = department;
@@ -135,55 +125,53 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount==1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Car updated succesfully");
-                        return Ok(Messages);
+                        string OkMessage = "Car updated succesfully";
+                        return Ok(OkMessage);
                     }
                     else
                     {
-                        Messages.Add($"{ammount} changes were made");
-                        return Ok(Messages);
+                        string OkMessage = $"{ammount} changes were made";
+                        return Ok(OkMessage);
                     }
 
                 }catch(Exception e)
                 {
-                    Messages.Add($"Some serous problems occured :c. You send {id} as ID");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors",$"Some serous problems occured :c. You send {id} as ID");
+                    return NotFound(ModelState);
                 }
 
             }
             else
             {
-                Messages.Add($"There is no car with certain id={id}");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"There is no car with certain id={id}");
+                return NotFound(ModelState);
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            List<string> Messages = new List<string>();
             var carToDelete = await _context.Cars.FirstOrDefaultAsync(ob => ob.RegistrationNumber == id);
             if (carToDelete == null)
             {
-                Messages.Add("Car with certain id was not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Car with certain id was not found");
+                return NotFound(ModelState);
             }
 
             _context.Cars.Remove(carToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Car deleted succesfully");
-            return Ok(Messages);
+            string OkMessage = "Car deleted succesfully";
+            return Ok(OkMessage);
         }
 
         [HttpPost]
         public async Task<ActionResult> Add([FromBody]Car car)
         {
-            List<string> Messages = new List<string>();
             if (car == null)
             {
-                Messages.Add("Recived car is null");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Recived car is null");
+                return NotFound(ModelState);
             }
             Car NewCar = car;
 
@@ -191,8 +179,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (department == null)
             {
-                Messages.Add("You can not add car to department, which doesnt exists");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","You can not add car to department, which doesnt exists");
+                return NotFound(ModelState);
             }
 
             NewCar.Department = department;
@@ -200,8 +188,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
             await _context.AddAsync(NewCar);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Car added succesfully");
-            return Ok(Messages);
+            string OkMessage = "Car added succesfully";
+            return Ok(OkMessage);
 
         }
 

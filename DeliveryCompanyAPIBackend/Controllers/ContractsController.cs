@@ -36,9 +36,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (contract == null)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Contract with certain id={id} not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"Contract with certain id={id} not found");
+                return NotFound(ModelState);
             }
 
             return Ok(contract);
@@ -50,8 +49,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
         {
             if (amount == 0)
             {
-                List<string> Messages = new List<string>() { "Problems occured. You send amount = 0" };
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Problems occured. You send amount = 0");
+                return NotFound(ModelState);
             }
 
             List<Contract> PartOfContracts = await _context.Contracts.ToListAsync();// get all list
@@ -65,11 +64,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
                         int amount2 = PartOfContracts.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
-                            List<string> Messages = new List<string>()
-                            {
-                                $"There are too few records in base to create {page} page.(Wrong page number)"
-                            };
-                            return NotFound(Messages);
+                            ModelState.AddModelError("errors",$"There are too few records in base to create {page} page.(Wrong page number)");
+                            return NotFound(ModelState);
                         }
                         PartOfContracts = PartOfContracts.GetRange((page - 1) * amount, amount2);
                     }
@@ -81,18 +77,14 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 }
                 else
                 {
-                    List<string> Messages = new List<string>()
-                {
-                    "There are no Contracts to display"
-                };
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors", "There are no Contracts to display");
+                    return NotFound(ModelState);
                 }
             }
             catch (Exception e)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"Some seroius problems occured. You send {amount} and {page} as numbers");
+                return NotFound(ModelState);
             }
 
         }
@@ -102,12 +94,10 @@ namespace DeliveryCompanyAPIBackend.Controllers
         public async Task<ActionResult> Update(int id, [FromBody] Contract UpContract)
         {
 
-            List<string> Messages = new List<string>();
-
             if (id == 0 || UpContract == null)
             {
-                Messages.Add("ID or Contract object is null");
-                return BadRequest(Messages);
+                ModelState.AddModelError("errors", "ID or Contract object is null");
+                return BadRequest(ModelState);
             }
 
             var contract = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
@@ -120,8 +110,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 var worker = await  _context.Workers.FirstOrDefaultAsync(ob => ob.Id == UpContract.WorkerId);
                 if (worker == null)
                 {
-                    Messages.Add("There are no worker with given id");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors","There are no worker with given id");
+                    return NotFound(ModelState);
                 }
 
                 contract.worker = worker;
@@ -132,27 +122,27 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Contract updated succesfully");
-                        return Ok(Messages);
+                        string OkMessage = "Contract updated succesfully";
+                        return Ok(OkMessage);
                     }
                     else
                     {
-                        Messages.Add($"{ammount} changes were made");
-                        return Ok(Messages);
+                        string OkMessage = $"{ammount} changes were made";
+                        return Ok(OkMessage);
                     }
 
                 }
                 catch (Exception e)
                 {
-                    Messages.Add($"Some serous problems occured :c. You send {id} as ID");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors",$"Some serous problems occured :c. You send {id} as ID");
+                    return NotFound(ModelState);
                 }
 
             }
             else
             {
-                Messages.Add($"There is no Contract with certain id={id}");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"There is no Contract with certain id={id}");
+                return NotFound(ModelState);
             }
         }
 
@@ -160,29 +150,27 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            List<string> Messages = new List<string>();
             var contractToDlete = await _context.Contracts.FirstOrDefaultAsync(ob => ob.Id == id);
             if (contractToDlete == null)
             {
-                Messages.Add("Contract with certain id was not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Contract with certain id was not found");
+                return NotFound(ModelState);
             }
 
             _context.Contracts.Remove(contractToDlete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Car deleted succesfully");
-            return Ok(Messages);
+            string OkMessage = "Car deleted succesfully";
+            return Ok(OkMessage);
         }
 
         [HttpPost]
         public async Task<ActionResult> Add([FromBody]Contract contract)
         {
-            List<string> Messages = new List<string>();
             if (contract == null)
             {
-                Messages.Add("Recived contract is null");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Recived contract is null");
+                return NotFound(ModelState);
             }
             Contract NewContract = contract;
 
@@ -190,8 +178,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (worker == null)
             {
-                Messages.Add("You can not add Contract to worker, which doesnt exists");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","You can not add Contract to worker, which doesnt exists");
+                return NotFound(ModelState);
             }
 
             NewContract.worker = worker;
@@ -199,8 +187,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
             await _context.AddAsync(NewContract);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Contract added succesfully");
-            return Ok(Messages);
+            string OkMessage = "Contract added succesfully";
+            return Ok(OkMessage);
         }
 
     }

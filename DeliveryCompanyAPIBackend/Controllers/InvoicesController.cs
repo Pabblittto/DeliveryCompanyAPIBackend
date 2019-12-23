@@ -37,9 +37,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (invoice == null)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Invoice with certain id={id} not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"Invoice with certain id={id} not found");
+                return NotFound(ModelState);
             }
 
             return Ok(invoice);
@@ -50,8 +49,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
         {
             if (amount == 0)
             {
-                List<string> Messages = new List<string>() { "Problems occured. You send amount = 0" };
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", "Problems occured. You send amount = 0");
+                return NotFound(ModelState);
             }
 
             List<Invoice> PartOfInvoices = await _context.Invoices.ToListAsync();// get all list
@@ -59,18 +58,14 @@ namespace DeliveryCompanyAPIBackend.Controllers
             {
                 if (PartOfInvoices.Count != 0)// there is something in this list
                 {
-                    //page-=1;// because index is counted from 0
 
                     if (PartOfInvoices.Count < (page) * amount)// if there is less elemnts for one page - take less elements
                     {
                         int amount2 = PartOfInvoices.Count - (page - 1) * amount;// number of elements less than it should be
                         if (amount2 < 0)
                         {
-                            List<string> Messages = new List<string>()
-                            {
-                                $"There are too few records in base to create {page} page.(Wrong page number)"
-                            };
-                            return NotFound(Messages);
+                            ModelState.AddModelError("errors", $"There are too few records in base to create {page} page.(Wrong page number)");
+                            return NotFound(ModelState);
                         }
                         PartOfInvoices = PartOfInvoices.GetRange((page - 1) * amount, amount2);
                     }
@@ -82,18 +77,14 @@ namespace DeliveryCompanyAPIBackend.Controllers
                 }
                 else
                 {
-                    List<string> Messages = new List<string>()
-                {
-                    "There are no Invoices to display"
-                };
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors", "There are no Invoices to display");
+                    return NotFound(ModelState);
                 }
             }
             catch (Exception e)
             {
-                List<string> Messages = new List<string>();
-                Messages.Add($"Some seroius problems occured. You send {amount} and {page} as numbers");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors", $"Some seroius problems occured. You send {amount} and {page} as numbers");
+                return NotFound(ModelState);
             }
 
         }
@@ -101,13 +92,10 @@ namespace DeliveryCompanyAPIBackend.Controllers
         [HttpPatch("{id}")]// api/Cars/Update
         public async Task<ActionResult> Update(int id, [FromBody] Invoice UpInvoice)
         {
-
-            List<string> Messages = new List<string>();
-
             if (id == 0 || UpInvoice == null)
             {
-                Messages.Add("ID or Invoice object is null");
-                return BadRequest(Messages);
+                ModelState.AddModelError("errors", "ID or Invoice object is null");
+                return BadRequest(ModelState);
             }
 
             var invoice = await _context.Invoices.FirstOrDefaultAsync(ob => ob.Id == id);
@@ -122,8 +110,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                 if (department == null)
                 {
-                    Messages.Add("There is no dapertment with given id");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors", "There is no dapertment with given id");
+                    return NotFound(ModelState);
                 }
 
                 invoice.department = department;
@@ -134,56 +122,53 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
                     if (ammount == 1)// amount means number of updated/added/etc. records
                     {
-                        Messages.Add("Invoice updated succesfully");
-                        return Ok(Messages);
+                        string OkMessage = "Invoice updated succesfully";
+                        return Ok(OkMessage);
                     }
                     else
                     {
-                        Messages.Add($"{ammount} changes were made");
-                        return Ok(Messages);
+                        string OkMessage = $"{ammount} changes were made";
+                        return Ok(OkMessage);
                     }
 
                 }
                 catch (Exception e)
                 {
-                    Messages.Add($"Some serous problems occured :c. You send {id} as ID");
-                    return NotFound(Messages);
+                    ModelState.AddModelError("errors",$"Some serous problems occured :c. You send {id} as ID");
+                    return NotFound(ModelState);
                 }
-
             }
             else
             {
-                Messages.Add($"There is no invoice with certain id={id}");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors",$"There is no invoice with certain id={id}");
+                return NotFound(ModelState);
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            List<string> Messages = new List<string>();
             var invoiceToDelete = await _context.Invoices.FirstOrDefaultAsync(ob => ob.Id == id);
             if (invoiceToDelete == null)
             {
-                Messages.Add("Invoice with certain id was not found");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Invoice with certain id was not found");
+                return NotFound(ModelState);
             }
 
             _context.Invoices.Remove(invoiceToDelete);
             await _context.SaveChangesAsync();
 
-            Messages.Add("Invoice deleted succesfully");
-            return Ok(Messages);
+            string OkMessage = "Invoice deleted succesfully";
+            return Ok(OkMessage);
         }
 
         [HttpPost]
         public async Task<ActionResult> Add([FromBody]Invoice invoice)
         {
-            List<string> Messages = new List<string>();
             if (invoice == null)
             {
-                Messages.Add("Recived invoice is null");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","Recived invoice is null");
+                return NotFound(ModelState);
             }
             Invoice NewInvoice = invoice;
 
@@ -191,8 +176,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
 
             if (department == null)
             {
-                Messages.Add("You can not add invoice to department, which doesnt exists");
-                return NotFound(Messages);
+                ModelState.AddModelError("errors","You can not add invoice to department, which doesnt exists");
+                return NotFound(ModelState);
             }
 
             NewInvoice.department = department;
@@ -200,8 +185,8 @@ namespace DeliveryCompanyAPIBackend.Controllers
             await _context.AddAsync(NewInvoice);
             await _context.SaveChangesAsync();
             
-            Messages.Add("Invoice added succesfully");
-            return Ok(Messages);
+            string OkMessage = "Invoice added succesfully";
+            return Ok(OkMessage);
 
         }
 
